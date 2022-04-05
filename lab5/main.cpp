@@ -188,7 +188,7 @@ int main()
         }
     }
     file.close();
-    std::cout << "---------" << std::endl;
+    std::cout << "Output:" << std::endl;
     PASS(root);
     return 0;
 }
