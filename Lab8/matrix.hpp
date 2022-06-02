@@ -1,9 +1,8 @@
-﻿#pragma once
+#pragma once
 #include <iostream>
 
 namespace AS
 {
-    //#define MY_DEBUG
     template<typename T, int N, int M>
     struct MasWrapper
     {
@@ -155,7 +154,7 @@ namespace AS
             }
             else
             {
-                std::cout << "Îïåðàöèÿ íå ïîääåðæèâàåòñÿ" << std::endl;
+                std::cout << "doesn't work" << std::endl;
                 return -1;
             }
         }
@@ -167,7 +166,7 @@ namespace AS
             if ((m_n == 2 && m_m == 2) || (m_n == 3 && m_m == 3)) {
                 int d = det();
                 if (d == 0)
-                    throw std::exception("Zero determinant");
+                    std::cout << "Zero det" << std::endl;
                 if (m_n == 2) {
                     tmp.m_mat[0][0] = static_cast<double>(m_mat[1][1]) / d;
                     tmp.m_mat[0][1] = static_cast<double>(-m_mat[0][1]) / d;
@@ -187,7 +186,7 @@ namespace AS
                 }
             }
             else {
-                std::cout << "Îïåðàöèÿ íå ïîääåðæèâàåòñÿ" << std::endl;
+                std::cout << "doesn't work" << std::endl;
             }
             return tmp;
         }

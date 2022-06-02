@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <cassert>
 #include "Matrix.hpp"
 using AS::Mat22d;
@@ -33,9 +33,9 @@ int main()
                    } });
 
         Mat22d X({ {
-                          {1, 1},
-                          {1, 1}
-                  } });
+                           {1, 1},
+                           {1, 1}
+                   } });
 
         auto B = A + X;
         assert(B.get(0, 0) == 2);
@@ -53,12 +53,14 @@ int main()
                    } });
 
         Mat22d X({ {
-                           {1},
-                           {1}
-            } });
+                           {1,1},
+                           {1,1}
+                   } });
         auto B = A - X;
         assert(B.get(0, 0) == 0);
+        assert(B.get(0, 1) == 0);
         assert(B.get(1, 0) == 0);
+        assert(B.get(1, 1) == 0);
     }
     std::cout << "Done!" << std::endl;
 
@@ -87,23 +89,20 @@ int main()
     }
     std::cout << "Done!" << std::endl;
 
-    std::cout << "=== Test 6 : A^-1 ===" << std::endl;
+    std::cout << "=== Test 6 : A**-1 ===" << std::endl;
     {
-        try
-        {
-            Mat22d A({ {
-                               {1,2},
-                               {5,4}
-                       } });
+        Mat22d A({ {
+                           {1,2},
+                           {3,4}
+                   } });
 
-            auto B = A.inverse();
-            assert(abs(B.get(0, 0) - static_cast<double>(-2) / 3) < 1e-6);
-        }
-        catch (const std::exception& e)
-        {
-            std::cerr << e.what() << std::endl;
-        }
+        auto B = A.inverse();
+        assert(B.get(0,0) == -2);
+        assert(B.get(0,1) == 1);
+        assert(B.get(1,0) == 1.5);
+        assert(B.get(1,1) == -0.5);
     }
     std::cout << "Done!" << std::endl;
+
     return 0;
 }
