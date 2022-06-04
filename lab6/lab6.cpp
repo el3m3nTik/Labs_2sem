@@ -1,141 +1,194 @@
 ﻿#include <iostream>
-
-struct T_List
+#include <fstream>
+#include <cstring>
+#include <string>
+using namespace std;
+struct Elem
 {
-	T_List* next;
-	int age;
+    int data;
+    Elem* left;
+    Elem* right;
+    Elem* parent;
 };
 
-void ADD(T_List* head, int age)
+Elem* MAKE(int data, Elem* p)
 {
-	T_List* p = new T_List;
-	p->age = age;
-
-	p->next = head->next;
-	head->next = p;
+    Elem* q = new Elem;
+    q->data = data;
+    q->left = nullptr;
+    q->right = nullptr;
+    q->parent = p;
+    return q;
 }
 
-void PRINT(T_List* head)
+void ADD(int data, Elem*& root)
 {
-	T_List* p = head->next;
-	while (p != nullptr)
-	{
-		std::cout << p->age << std::endl;
-		p = p->next;
-	}
+    if (root == nullptr) {
+        root = MAKE(data, nullptr);
+        return;
+    }
+    Elem* v = root;
+    while ((data < v->data && v->left != nullptr) || (data > v->data && v->right != nullptr))
+        if (data < v->data)
+            v = v->left;
+        else
+            v = v->right;
+    if (data == v->data)
+        return;
+    Elem* u = MAKE(data, v);
+    if (data < v->data)
+        v->left = u;
+    else
+        v->right = u;
 }
 
-void DELETE(T_List* head)
+void PASS(Elem* v)
 {
-	T_List* tmp;
-	T_List* p = head;
-	while (p->next != nullptr)
-	{
-		if (p->next->age % 2 == 0)
-		{
-			tmp = p->next;
-			p->next = p->next->next;
-			delete tmp;
-		}
-		else
-			p = p->next;
-	}
+    if (v == nullptr)
+        return;
+    PASS(v->left);
+    std::cout << v->data << std::endl;
+    PASS(v->right);
 }
 
-void CLEAR(T_List* head)
+Elem* DEEP(int data, Elem* v, int& k) // v - ,
 {
-	T_List* tmp;
-	T_List* p = head->next;
-	while (p != nullptr)
-	{
-		tmp = p;
-		p = p->next;
-		delete tmp;
-	}
+    k += 1;
+    if (v == nullptr)
+        return v;
+    if (v->data == data)
+        return v;
+    if (data < v->data)
+    {
+        return DEEP(data, v->left, k);
+    }
+    else
+    {
+        return DEEP(data, v->right, k);
+    }
 }
 
-void DUPLICATE(T_List* head)
+//Ïîèñê ýëåìåíòà
+Elem* SEARCH(int data, Elem* v) // v - ,
 {
-	T_List* p = head->next;
-	while (p != nullptr)
-	{
-		if (p->age % 2 == 1)
-		{
-			T_List* q = new T_List;
-			q->next = p->next;
-			p->next = q;
-			q->age = p->age;
-			p = p->next;
-		}
-		p = p->next;
-	}
+    if (v == nullptr)
+        return v;
+    if (v->data == data)
+        return v;
+    if (data < v->data)
+        return SEARCH(data, v->left);
+    else
+        return SEARCH(data, v->right);
 }
 
-void SWAPSORT(T_List* head)
+//Óäàëåíèå
+void DELETE(int data, Elem*& root)
 {
-	T_List* p = head->next;
-	while (p->next->next != nullptr)
-	{
-		T_List* q = p->next;
-		while (q->next != nullptr)
-		{
-			if (p->age > q->age)
-				std::swap(p->age, q->age);
-			q = q->next;
-		}
-		p = p->next;
-	}
+    //   .
+    Elem* u = SEARCH(data, root);
+    if (u == nullptr)
+        return;
+
+    //   ( )
+    if (u->left == nullptr && u->right == nullptr && u == root)
+    {
+        delete root;
+        root = nullptr;
+        return;
+    }
+
+    //
+    if (u->left == nullptr && u->right != nullptr && u == root) // TODO  u==root
+    {
+        Elem* t = u->right;
+        while (t->left != nullptr)
+            t = t->left;
+        u->data = t->data;
+        u = t;
+    }
+
+    //
+    if (u->left != nullptr && u->right == nullptr && u == root) // TODO  u==root
+    {
+        Elem* t = u->left;
+        while (t->right != nullptr)
+            t = t->right;
+        u->data = t->data;
+        u = t;
+    }
+
+    //
+    if (u->left != nullptr && u->right != nullptr)
+    {
+        Elem* t = u->right;
+        while (t->left != nullptr)
+            t = t->left;
+        u->data = t->data;
+        u = t;
+    }
+    Elem* t;
+    if (u->left == nullptr)
+        t = u->right;
+    else
+        t = u->left;
+    if (u->parent->left == u)
+        u->parent->left = t;
+    else
+        u->parent->right = t;
+    if (t != nullptr)
+        t->parent = u->parent;
+    delete u;
 }
 
-void SEARCH(T_List* head, int p)
-{
-	T_List* tmp = head;
 
-	while (tmp != nullptr)
-	{
-		if (tmp->age == p)
-		{
-			std::cout << "Èñêîìûé ýëåìåíò åñòü â ñïèñêå " << "\n";
-			break;
-		}
-		else
-			tmp = tmp->next;
-	}
+
+void CLEAR(Elem*& v)
+{
+    if (v == nullptr)
+        return;
+    CLEAR(v->left);
+
+    CLEAR(v->right);
+
+    delete v;
+    v = nullptr;
 }
+
 
 int main()
 {
-	setlocale(LC_ALL, "Rus");
-	T_List* head = new T_List;
-	head->next = nullptr;
+    Elem* root = nullptr;
 
-	ADD(head, 10);
-	ADD(head, 2);
-	ADD(head, 3);
-	ADD(head, 5);
-	ADD(head, 6);
+    std::ifstream file("..//input.txt");
+    std::ofstream fin("..//output.txt");
+    std::string line;
 
-	SEARCH(head, 2);
-
-	PRINT(head);
-
-	std::cout << "====" << std::endl;
-
-	SWAPSORT(head);
-	PRINT(head);
-
-	std::cout << "====" << std::endl;
-
-	DELETE(head);
-	PRINT(head);
-
-	std::cout << "====" << std::endl;
-
-	DUPLICATE(head);
-	PRINT(head);
-
-	CLEAR(head);
-
-	delete head;
-	return 0;
+    while (getline(file, line)) {
+        std::cout << line << std::endl;
+        char ch = line[0];
+        line.erase(line.begin());
+        //std::cout << "!" << command << std::endl;
+        if (line.size() > 0) {
+            int numb = stoi(line);
+            if (ch == '+') {
+                ADD(numb, root);
+            } else if (ch == '-') {
+                DELETE(numb, root);
+            } else { //если '?'
+                int k = 0;
+                if (SEARCH(numb, root) == nullptr) {
+                    fin << "n";
+                } else {
+                    DEEP(numb, root, k);
+                    fin << k;
+                }
+            }
+        } else if (ch == 'E') { //если 'E'
+            break;
+        }
+    }
+    file.close();
+    std::cout << "Output:" << std::endl;
+    PASS(root);
+    return 0;
 }
